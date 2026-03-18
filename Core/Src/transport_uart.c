@@ -91,7 +91,7 @@ HAL_StatusTypeDef Transport_Start(void) {
   return status;
 }
 
-void Transport_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t size) {
   uint16_t i;
 
   if ((huart != s_uart) || (huart == NULL)) {
