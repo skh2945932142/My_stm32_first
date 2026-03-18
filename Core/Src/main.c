@@ -6,10 +6,8 @@
  ******************************************************************************
  */
 /* USER CODE END Header */
-/* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
-/* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "board_hw.h"
 #include "device_state.h"
@@ -30,48 +28,35 @@
 /* Private variables ---------------------------------------------------------*/
 I2C_HandleTypeDef hi2c1;
 
-UART_HandleTypeDef huart3;
-DMA_HandleTypeDef hdma_usart3_rx;
-DMA_HandleTypeDef hdma_usart3_tx;
+/* ── 改动 1：USART3 → USART2，DMA 通道 2/3 → 6/7 ── */
+UART_HandleTypeDef huart2;
+DMA_HandleTypeDef hdma_usart2_rx;
+DMA_HandleTypeDef hdma_usart2_tx;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_DMA_Init(void);
-static void MX_USART3_UART_Init(void);
+static void MX_USART2_UART_Init(void); /* ── 改动 2 ── */
 static void MX_I2C1_Init(void);
 
-/**
- * @brief  The application entry point.
- * @retval int
- */
 int main(void) {
-
-  /* MCU Configuration -------------------------------------------------------*/
   HAL_Init();
   SystemClock_Config();
 
-  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_USART3_UART_Init();
+  MX_USART2_UART_Init(); /* ── 改动 3 ── */
   MX_I2C1_Init();
 
   /* USER CODE BEGIN 2 */
-
-  /* 等待 OLED 上电稳定（STM32 启动比 OLED 快，需留足时间） */
   HAL_Delay(100);
 
-  /* 外设初始化 */
   OLED_Init();
   DeviceState_Init();
   BoardHw_Init();
   Oled_ModuleInit();
 
-  /* ── BUG FIX: 开机在 OLED 上显示启动画面 ──────────────────────────
-   * 原代码 Oled_ModuleInit() 只清屏，OLED 全黑，用户以为屏幕没亮。
-   * 在这里主动绘制一帧，让屏幕立刻有可见内容。
-   * ─────────────────────────────────────────────────────────────────*/
   OLED_NewFrame();
   OLED_PrintASCIIString(4,  0, "Keysking STM32",  &afont8x6, OLED_COLOR_NORMAL);
   OLED_DrawLine(0, 10, 127, 10, OLED_COLOR_NORMAL);
@@ -79,16 +64,14 @@ int main(void) {
   OLED_PrintASCIIString(0, 24, "UART: 115200",     &afont8x6, OLED_COLOR_NORMAL);
   OLED_PrintASCIIString(0, 34, "Waiting serial..", &afont8x6, OLED_COLOR_NORMAL);
   OLED_ShowFrame();
-  /* ────────────────────────────────────────────────────────────────── */
 
-  Transport_Init(&huart3);
+  Transport_Init(&huart2); /* ── 改动 4 ── */
   if (Transport_Start() != HAL_OK) {
     Error_Handler();
   }
   Proto_SendLog("info", "boot ok");
   /* USER CODE END 2 */
 
-  /* Infinite loop */
   while (1) {
     BoardHw_Task();
     Proto_Poll();
@@ -99,9 +82,6 @@ int main(void) {
   }
 }
 
-/**
- * @brief System Clock Configuration
- */
 void SystemClock_Config(void) {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
@@ -129,9 +109,6 @@ void SystemClock_Config(void) {
   }
 }
 
-/**
- * @brief I2C1 Initialization Function
- */
 static void MX_I2C1_Init(void) {
   hi2c1.Instance = I2C1;
   hi2c1.Init.ClockSpeed = 100000;
@@ -147,37 +124,34 @@ static void MX_I2C1_Init(void) {
   }
 }
 
-/**
- * @brief USART3 Initialization Function
- */
-static void MX_USART3_UART_Init(void) {
-  huart3.Instance = USART3;
-  huart3.Init.BaudRate = 115200;
-  huart3.Init.WordLength = UART_WORDLENGTH_8B;
-  huart3.Init.StopBits = UART_STOPBITS_1;
-  huart3.Init.Parity = UART_PARITY_NONE;
-  huart3.Init.Mode = UART_MODE_TX_RX;
-  huart3.Init.HwFlowCtl = UART_HWCONTROL_NONE;
-  huart3.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart3) != HAL_OK) {
+/* ── 改动 5：USART2 初始化，引脚 PA2/PA3 ── */
+static void MX_USART2_UART_Init(void) {
+  huart2.Instance = USART2;
+  huart2.Init.BaudRate = 115200;
+  huart2.Init.WordLength = UART_WORDLENGTH_8B;
+  huart2.Init.StopBits = UART_STOPBITS_1;
+  huart2.Init.Parity = UART_PARITY_NONE;
+  huart2.Init.Mode = UART_MODE_TX_RX;
+  huart2.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart2) != HAL_OK) {
     Error_Handler();
   }
 }
 
-/**
- * @brief DMA Initialization Function
- */
+/* ── 改动 6：DMA 中断改为 Channel6/7（USART2 对应通道）── */
 static void MX_DMA_Init(void) {
   __HAL_RCC_DMA1_CLK_ENABLE();
-  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
-  HAL_NVIC_SetPriority(DMA1_Channel3_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel3_IRQn);
+
+  /* USART2_TX → DMA1_Channel7 */
+  HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
+
+  /* USART2_RX → DMA1_Channel6 */
+  HAL_NVIC_SetPriority(DMA1_Channel6_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel6_IRQn);
 }
 
-/**
- * @brief GPIO Initialization Function
- */
 static void MX_GPIO_Init(void) {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
 
@@ -185,7 +159,7 @@ static void MX_GPIO_Init(void) {
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
-  /* RGB LED：共阳接法，低电平点亮。开机红+蓝亮（紫色）表示上电正常 */
+  /* RGB LED 共阳，低电平亮，开机紫色（红+蓝） */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_RESET); /* 蓝 ON  */
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, GPIO_PIN_SET);   /* 绿 OFF */
   HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET); /* 红 ON  */
@@ -203,17 +177,13 @@ static void MX_GPIO_Init(void) {
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
-/* USER CODE BEGIN 5 */
+/* ── 改动 7：回调里判断 USART2 ── */
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
-  if (huart->Instance == USART3) {
+  if (huart->Instance == USART2) {
     Transport_RxEventCallback(huart, Size);
   }
 }
-/* USER CODE END 5 */
 
-/**
- * @brief Error Handler
- */
 void Error_Handler(void) {
   __disable_irq();
   while (1) {
@@ -223,4 +193,4 @@ void Error_Handler(void) {
 #ifdef USE_FULL_ASSERT
 void assert_failed(uint8_t *file, uint32_t line) {
 }
-#endif /* USE_FULL_ASSERT */
+#endif
