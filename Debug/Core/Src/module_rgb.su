@@ -1,0 +1,7 @@
+../Core/Src/module_rgb.c:11:16:rgb_clamp	16	static
+../Core/Src/module_rgb.c:21:13:rgb_apply_outputs	16	static
+../Core/Src/module_rgb.c:27:13:rgb_report_static_state	72	static
+../Core/Src/module_rgb.c:36:6:Rgb_Set	24	static
+../Core/Src/module_rgb.c:48:6:Rgb_Off	8	static
+../Core/Src/module_rgb.c:52:6:Rgb_Handle	136	static
+../Core/Src/module_rgb.c:129:6:Rgb_Task	40	static

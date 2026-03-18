@@ -1,0 +1,7 @@
+../Core/Src/transport_uart.c:18:13:transport_queue_line	4
+../Core/Src/transport_uart.c:40:13:transport_feed_byte	6
+../Core/Src/transport_uart.c:66:6:Transport_Init	1
+../Core/Src/transport_uart.c:78:19:Transport_Start	4
+../Core/Src/transport_uart.c:94:6:Transport_RxEventCallback	4
+../Core/Src/transport_uart.c:108:6:Transport_ReadLine	4
+../Core/Src/transport_uart.c:128:6:Transport_SendLine	4

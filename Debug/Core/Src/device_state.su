@@ -1,0 +1,3 @@
+../Core/Src/device_state.c:7:6:DeviceState_Init	8	static
+../Core/Src/device_state.c:15:14:DeviceState_GetMutable	4	static
+../Core/Src/device_state.c:19:20:DeviceState_Get	4	static

@@ -1,0 +1,2 @@
+../Core/Src/module_buzzer.c:9:6:Buzzer_Handle	96	static
+../Core/Src/module_buzzer.c:44:6:Buzzer_Task	16	static

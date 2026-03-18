@@ -1,0 +1,5 @@
+../Core/Src/module_sensor.c:12:13:sensor_format_fixed1	48	static
+../Core/Src/module_sensor.c:30:13:sensor_report_inputs_if_changed	104	static
+../Core/Src/module_sensor.c:56:13:sensor_report_aht20	120	static
+../Core/Src/module_sensor.c:72:6:Sensor_Handle	168	static
+../Core/Src/module_sensor.c:137:6:Sensor_Task	16	static
