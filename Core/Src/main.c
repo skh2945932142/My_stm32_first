@@ -140,8 +140,11 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    Proto_Poll();
+    Sensor_Task();
+    BoardHw_Task();
     /* USER CODE BEGIN 3 */
+
   }
   /* USER CODE END 3 */
 }
@@ -239,7 +242,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 0;
+  htim2.Init.Prescaler = 71;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 65535;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -467,18 +470,6 @@ void Error_Handler(void)
   __disable_irq();
   while (1)
   {
-	  /* USER CODE END WHILE */
-
-	      /* USER CODE BEGIN 3 */
-
-	      // 1. 处理串口协议：不断检查有没有从 Web 控制台发来的新指令
-	      Proto_Poll();
-
-	      // 2. 处理传感器：处理温湿度、超声波的定时自动上报
-	      Sensor_Task();
-
-	      // 3. 处理底层硬件：处理按键编码器读取、控制蜂鸣器超时等
-	      BoardHw_Task();
   }
   /* USER CODE END Error_Handler_Debug */
 }
@@ -498,3 +489,4 @@ void assert_failed(uint8_t *file, uint32_t line)
   /* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */
+
