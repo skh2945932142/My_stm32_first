@@ -1,7 +1,7 @@
 ../Core/Src/module_rgb.c:11:16:rgb_clamp	3
-../Core/Src/module_rgb.c:21:13:rgb_apply_outputs	1
-../Core/Src/module_rgb.c:27:13:rgb_report_static_state	1
-../Core/Src/module_rgb.c:36:6:Rgb_Set	4
-../Core/Src/module_rgb.c:48:6:Rgb_Off	1
-../Core/Src/module_rgb.c:52:6:Rgb_Handle	15
-../Core/Src/module_rgb.c:129:6:Rgb_Task	6
+../Core/Src/module_rgb.c:29:13:rgb_apply_outputs	1
+../Core/Src/module_rgb.c:36:13:rgb_report_static_state	1
+../Core/Src/module_rgb.c:45:6:Rgb_Set	4
+../Core/Src/module_rgb.c:57:6:Rgb_Off	1
+../Core/Src/module_rgb.c:61:6:Rgb_Handle	15
+../Core/Src/module_rgb.c:138:6:Rgb_Task	6
