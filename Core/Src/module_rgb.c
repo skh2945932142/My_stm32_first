@@ -18,10 +18,19 @@ static uint8_t rgb_clamp(int value) {
   return (uint8_t)value;
 }
 
+/* ── BUG FIX: RGB LED 共阳接法逻辑修正 ────────────────────────────────
+ * 电路图：MHP5050RGBDT 共阳极接 3.3V，阴极通过限流电阻接 GPIO。
+ *   GPIO 低电平 (RESET) → 电流流通 → LED 亮
+ *   GPIO 高电平 (SET)   → 无电流   → LED 灭
+ *
+ * 原代码：r_on ? GPIO_PIN_SET : GPIO_PIN_RESET   ← 高电平=亮，逻辑反了！
+ * 修正后：r_on ? GPIO_PIN_RESET : GPIO_PIN_SET   ← 低电平=亮，正确。
+ * ─────────────────────────────────────────────────────────────────── */
 static void rgb_apply_outputs(uint8_t r_on, uint8_t g_on, uint8_t b_on) {
-  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, r_on ? GPIO_PIN_SET : GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, g_on ? GPIO_PIN_SET : GPIO_PIN_RESET);
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, b_on ? GPIO_PIN_SET : GPIO_PIN_RESET);
+  /* 红色：PB0  绿色：PA7  蓝色：PA6  —— 共阳，低有效 */
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, r_on ? GPIO_PIN_RESET : GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_7, g_on ? GPIO_PIN_RESET : GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, b_on ? GPIO_PIN_RESET : GPIO_PIN_SET);
 }
 
 static void rgb_report_static_state(void) {
