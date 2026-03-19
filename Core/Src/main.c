@@ -144,7 +144,12 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+    Proto_Poll();
+    BoardHw_Task();
+    Rgb_Task();
+    Buzzer_Task();
+    Sensor_Task();
+    Servo_Task();
     /* USER CODE BEGIN 3 */
 
   }
