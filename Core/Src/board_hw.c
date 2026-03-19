@@ -365,3 +365,21 @@ void BoardHw_GetInputState(BoardInputState *state) {
       (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_15) == GPIO_PIN_RESET) ? 1U : 0U;
   state->encoder_position = s_board_hw.encoder_position;
 }
+uint8_t BoardHw_ReadTCRT5000_D0(void)
+{
+  // 读取 PB14 的电平
+  if (HAL_GPIO_ReadPin(GPIOB, GPIO_PIN_14) == GPIO_PIN_RESET)
+  {
+    return 0; // 低电平：检测到反射物
+  }
+  else
+  {
+    return 1; // 高电平：未检测到反射物
+  }
+}
+
+uint16_t BoardHw_ReadTCRT5000_A0(void)
+{
+  // PA4 对应 ADC1 的 Channel 4，直接调用你已有的底层函数
+  return BoardHw_ReadAdcChannel(4);
+}

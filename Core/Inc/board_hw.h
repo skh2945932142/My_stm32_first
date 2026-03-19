@@ -36,5 +36,11 @@ bool BoardHw_ReadUltrasonic(float *distance_cm);
 uint16_t BoardHw_ReadAdcChannel(uint8_t channel);
 
 void BoardHw_GetInputState(BoardInputState *state);
+// 读取 TCRT5000 数字引脚状态 (PB14)
+// 返回 0: 触发(有障碍/白线)   返回 1: 未触发(无障碍/黑线)
+uint8_t BoardHw_ReadTCRT5000_D0(void);
 
+// 读取 TCRT5000 模拟引脚数值 (PA4)
+// 返回 0~4095 的 ADC 原始值
+uint16_t BoardHw_ReadTCRT5000_A0(void);
 #endif /* __BOARD_HW_H__ */

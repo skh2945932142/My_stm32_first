@@ -138,7 +138,27 @@ void Sensor_Task(void) {
   DeviceState *state = DeviceState_GetMutable();
 
   sensor_report_inputs_if_changed();
+  static uint8_t last_tcrt_state = 255; // 记录上次状态
+  uint8_t current_tcrt_state = BoardHw_ReadTCRT5000_D0();
+  // 只有当 D0 状态发生变化时才上报，防止串口被刷爆
+  if (current_tcrt_state != last_tcrt_state)
+  {
+    char log_msg[64];
 
+    if (current_tcrt_state == 0)
+    {
+      // 如果触发了障碍物，顺便读一下 A0 的模拟值，看看距离有多近
+      uint16_t analog_val = BoardHw_ReadTCRT5000_A0();
+      snprintf(log_msg, sizeof(log_msg), "TCRT5000: Obstacle Detected! ADC:%u", analog_val);
+      Proto_SendLog("info", log_msg);
+    }
+    else
+    {
+      Proto_SendLog("info", "TCRT5000: Clear!");
+    }
+
+    last_tcrt_state = current_tcrt_state;
+  }
   if (!state->sensor_auto_enabled) {
     return;
   }
