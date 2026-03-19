@@ -20,3 +20,5 @@
 ../Core/Src/board_hw.c:311:6:BoardHw_ReadUltrasonic	6
 ../Core/Src/board_hw.c:345:10:BoardHw_ReadAdcChannel	2
 ../Core/Src/board_hw.c:355:6:BoardHw_GetInputState	5
+../Core/Src/board_hw.c:368:9:BoardHw_ReadTCRT5000_D0	2
+../Core/Src/board_hw.c:381:10:BoardHw_ReadTCRT5000_A0	1
